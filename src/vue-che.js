@@ -69,7 +69,8 @@
 				// то поле будет обязательным всегда
 				var hasExtraCondition = extras.param && typeof extras.param.condition !== 'undefined';
 				var extraCondition = hasExtraCondition ? extras.param.condition : true;
-				return !mval && extraCondition ? 'Поле обязательное' : '';
+				var mvalFalsey = !mval || !mval.length; // made for empty arrays (multiple checkboxes)
+				return mvalFalsey && extraCondition ? 'Field is required' : '';
 			},
 			date: function (mval, context) {
 				return !mval || /^\d{2}\.\d{2}\.\d{4}$/.test(mval) ? '' : 'Формат даты - дд.мм.гггг';
@@ -204,6 +205,36 @@
 				// не вызывала ошибки рендеринга, как это было с прямой 
 				// проверкой проперти v-if="pass.FIELDNAME.validationMethod"
 				methods: {
+					/**
+						Getting error text (if any) of particular model prop.
+						Args:
+						* fieldName	- model prop name
+						* context	- optional. Default context is global $data
+						Basic usage:
+						* <span v-html="cheErr('LASTNAME')" />
+
+					*/
+					cheErr: function (fieldName, context) { // проверка, валидно ли поле
+						fieldName = fieldName.toUpperCase(); // string expected
+						context = context || this.$data;
+						time('che')
+						if (context.$che && context.$che[fieldName]) {
+							for (var validationMethod in context.$che[fieldName]) {
+								var errText = context.$che[fieldName][validationMethod];
+								if (!!errText && validationMethod.charAt(0) !== '$') {
+									// проверка на $ чтобы можно было иметь not enumerable служебные свойства
+									context.$che[fieldName][invFieldPropName] = errText;
+									return errText
+								}
+							}
+							context.$che[fieldName][invFieldPropName] = '';
+							time('che', 1)
+							return '';
+						}
+						else {
+							return '';
+						}
+					},
 					// Проверка тупо всех инпутов. TODO подумать, как сделать оптимальнее.
 					cheAll: function () {
 						for (var i = 0; i < cheData.inputs.$all.length; i++) {
@@ -238,36 +269,6 @@
 						context.$che_context_invalid = bInvalid;
 						time('cheContext', true);
 						return bInvalid;
-					},
-					/**
-						Getting error text (if any) of particular model prop.
-						Args:
-						* fieldName	- model prop name
-						* context	- optional. Default context is global $data
-						Basic usage:
-						* <span v-html="cheErr('LASTNAME')" />
-
-					*/
-					cheErr: function (fieldName, context) { // проверка, валидно ли поле
-						fieldName = fieldName.toUpperCase(); // string expected
-						context = context || this.$data;
-						time('che')
-						if (context.$che && context.$che[fieldName]) {
-							for (var validationMethod in context.$che[fieldName]) {
-								var errText = context.$che[fieldName][validationMethod];
-								if (!!errText && validationMethod.charAt(0) !== '$') {
-									// проверка на $ чтобы можно было иметь not enumerable служебные свойства
-									context.$che[fieldName][invFieldPropName] = errText;
-									return errText
-								}
-							}
-							context.$che[fieldName][invFieldPropName] = '';
-							time('che', 1)
-							return '';
-						}
-						else {
-							return '';
-						}
 					},
 					// Получить результат валидации конкретного метода конкретного поля
 					// Отличие от cheTrigger в том что данный метод не дёргает саму валидацию, а лишь получает ранее вычисленный результат
