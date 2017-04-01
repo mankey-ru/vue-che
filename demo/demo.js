@@ -6,7 +6,7 @@ new Vue({
 		mselect: null,
 		mtextarea: '',
 		mradio: null,
-		mchbox: null,
+		mchbox: [],
 		$che: {
 
 		}
