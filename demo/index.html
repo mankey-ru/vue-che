@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>Document</title>
+	<script src="./../src/vue-che.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.2.6/vue.js"></script>
+</head>
+<body>
+	<style>
+		hr {
+			margin: 1em 0;
+		}
+		label {
+			/*display: block;*/
+		}
+		* {			
+			font-family: consolas, monospace;
+		}
+		#vue-app {
+			width:600px;
+			margin: 2em auto;
+		}
+		.che-err-inp {
+			background-color: yellow;
+		}
+	</style>
+	<div id="vue-app">
+		<h1>Basic form</h1>
+		<label>			
+			Text input <input class="tt" v-model="mtext" v-che:mtext.reqd />
+		</label>	
+		<span v-html="cheErr('mtext')"></span>  
+
+		<hr />
+		<label>
+			Select 
+			<select class="tt" v-model="mselect" v-che:mselect.reqd>
+				<option value="">NULLLL</option>
+				<option value="1" selected>aaa</option>
+				<option value="2">sss</option>
+				<option value="3">ddd</option>
+			</select>		
+		</label>
+		<span v-html="cheErr('mselect')"></span>
+
+		<hr />
+		<label>			
+			Textarea <textarea class="tt" v-model="mtextarea" v-che:mtextarea.reqd></textarea>
+		</label>
+		<span v-html="cheErr('mtextarea')"></span>
+
+		<hr />	
+		Radio	
+		<label>			
+			<input type="radio" name="ra" class="tt" v-model="mradio" v-che:mradio.reqd value="1" /> 1
+		</label>
+		<label>			
+			<input type="radio" name="ra" class="tt" v-model="mradio" v-che:mradio.reqd value="2" /> 2
+		</label>
+		
+
+		<hr />
+		Checkbox
+		<label>
+			<input type="checkbox" name="ch" class="tt"  v-model="mchbox" v-che:mradio.reqd value="1" /> 1
+		</label>
+		<label>
+			<input type="checkbox" name="ch" class="tt"  v-model="mchbox" v-che:mradio.reqd value="2" /> 2
+		</label>		
+		<hr />
+		<button v-on:click="cheAll">Submit!</button>
+		<h2>Vue data</h2>
+		<pre v-html="data"></pre>
+	</div>
+
+
+	<script src="demo.js"></script>
+</body>
+</html>
