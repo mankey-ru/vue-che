@@ -9,52 +9,57 @@
 <body>
 	<div id="vue-app">
 		<h1>Basic form</h1>
-		<label>			
-			Text input <input class="tt" v-model="mtext" v-che:mtext.reqd />
-		</label>	
-		<span v-html="cheErr('mtext')"></span>  
+		<form v-on:submit.prevent="submitHandler">
+			<label>			
+				<div>
+					Text input (required, email)
+				</div>
+				<input class="tt" v-model="mtext" v-che:mtext.reqd.f_email />
+			</label>	
+			<span class="che-err-msg" v-html="cheErr('mtext')"></span>  
 
-		<hr />
-		<label>
-			Select 
-			<select class="tt" v-model="mselect" v-che:mselect.reqd>
-				<option value="">NULLLL</option>
-				<option value="1" selected>aaa</option>
-				<option value="2">sss</option>
-				<option value="3">ddd</option>
-			</select>		
-		</label>
-		<span v-html="cheErr('mselect')"></span>
+			<hr />
+			<label>
+				<div>Select</div> 
+				<select class="tt" v-model="mselect" v-che:mselect.reqd>
+					<option value="">NULLLL</option>
+					<option value="1" selected>aaa</option>
+					<option value="2">sss</option>
+					<option value="3">ddd</option>
+				</select>		
+			</label>
+			<span class="che-err-msg" v-html="cheErr('mselect')"></span>
 
-		<hr />
-		<label>			
-			Textarea <textarea class="tt" v-model="mtextarea" v-che:mtextarea.reqd></textarea>
-		</label>
-		<span v-html="cheErr('mtextarea')"></span>
+			<hr />
+			<label>			
+				<div>Textarea</div> <textarea class="tt" v-model="mtextarea" v-che:mtextarea.reqd></textarea>
+			</label>
+			<span class="che-err-msg" v-html="cheErr('mtextarea')"></span>
 
-		<hr />	
-		Radio	
-		<label>			
-			<input type="radio" name="ra" class="tt" v-model="mradio" v-che:mradio.reqd value="1" /> 1
-		</label>
-		<label>			
-			<input type="radio" name="ra" class="tt" v-model="mradio" v-che:mradio.reqd value="2" /> 2
-		</label>
-		<span v-html="cheErr('mradio')"></span>
-		
+			<hr />	
+			<div>Radio</div>	
+			<label>			
+				<input type="radio" name="ra" class="tt" v-model="mradio" v-che:mradio.reqd value="1" /> 1
+			</label>
+			<label>			
+				<input type="radio" name="ra" class="tt" v-model="mradio" v-che:mradio.reqd value="2" /> 2
+			</label>
+			<span class="che-err-msg" v-html="cheErr('mradio')"></span>
 
-		<hr />
-		Checkbox
-		<label>
-			<input type="checkbox" name="ch" class="tt"  v-model="mchbox" v-che:mchbox.reqd value="1" /> 1
-		</label>
-		<label>
-			<input type="checkbox" name="ch" class="tt"  v-model="mchbox" v-che:mchbox.reqd value="2" /> 2
-		</label>
-		<span v-html="cheErr('mchbox')"></span>
 
-		<hr />
-		<button v-on:click="cheAll">Submit!</button>	
+			<hr />
+			<div>Checkbox</div>
+			<label>
+				<input type="checkbox" name="ch" class="tt"  v-model="mchbox" v-che:mchbox.reqd value="1" /> 1
+			</label>
+			<label>
+				<input type="checkbox" name="ch" class="tt"  v-model="mchbox" v-che:mchbox.reqd value="2" /> 2
+			</label>
+			<span class="che-err-msg" v-html="cheErr('mchbox')"></span>
+
+			<hr />
+			<button type="submit">Submit!</button>
+		</form>	
 
 		<h2>Vue data</h2>
 		<pre v-html="data"></pre>
@@ -65,9 +70,9 @@
 	<style>
 		hr {
 			margin: 1em 0;
-		}
-		label {
-			/*display: block;*/
+			border: solid;
+			border-color: #bbb;
+			border-width: 1px 0 0 0;
 		}
 		* {			
 			font-family: consolas, monospace;
@@ -76,12 +81,22 @@
 			width:600px;
 			margin: 2em auto;
 		}
-		.che-err-inp {
-			/*background-color: yellow;*/
-			box-shadow: inset red 0 0 0px 2px;
+		input, textarea, select {
+			border: solid 1px #666;
+			padding: .3em;
+			resize: none;
 		}
-		span {
+		input:focus, textarea:focus, select:focus{
+			outline: none;
+		}
+		.che-err-inp {
+			border-color: red;
+		}
+		.che-err-msg {
 			color: red;
+		}
+		button[type=submit] {
+			font-size: 2em;
 		}
 	</style>
 </body>

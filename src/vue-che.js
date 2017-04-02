@@ -72,8 +72,12 @@
 				var mvalFalsey = !mval || !mval.length; // made for empty arrays (multiple checkboxes)
 				return mvalFalsey && extraCondition ? 'Field is required' : '';
 			},
-			date: function (mval, context) {
+			f_date: function (mval) {
 				return !mval || /^\d{2}\.\d{2}\.\d{4}$/.test(mval) ? '' : 'Формат даты - дд.мм.гггг';
+			},
+			f_email: function (mval) {
+				// RFC 2822 Section 3.4.1 is too much, so this simple regex is enough I guess
+				return !mval || /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mval) ? '' : 'Incorrect format';
 			}
 		}
 		this._methods = cheMethodsLib;
@@ -175,7 +179,10 @@
 
 							}
 							else {
-								console.error('В cheMethodsLib не найден метод валидации ' + cheMethodName)
+								var availableMeth = Object.keys(cheMethodsLib).filter(function (k) {
+									return typeof cheMethodsLib[k] === 'function'
+								}).join(', ');
+								console.error('vue-che: Not found validation method with name «' + cheMethodName + '».\nAvailable methods: ' + availableMeth)
 							}
 						}
 
@@ -217,7 +224,7 @@
 					cheErr: function (fieldName, context) { // проверка, валидно ли поле
 						fieldName = fieldName.toUpperCase(); // string expected
 						context = context || this.$data;
-						time('che')
+						time('cheErr')
 						if (context.$che && context.$che[fieldName]) {
 							for (var validationMethod in context.$che[fieldName]) {
 								var errText = context.$che[fieldName][validationMethod];
@@ -228,7 +235,7 @@
 								}
 							}
 							context.$che[fieldName][invFieldPropName] = '';
-							time('che', 1)
+							time('cheErr', 1)
 							return '';
 						}
 						else {
@@ -237,6 +244,7 @@
 					},
 					// Проверка тупо всех инпутов. TODO подумать, как сделать оптимальнее.
 					cheAll: function () {
+						time('cheAll');
 						for (var i = 0; i < cheData.inputs.$all.length; i++) {
 							cheData.inputs.$all[i].dispatchEvent(customEventsLib.cheAll)
 						}
@@ -248,6 +256,7 @@
 						if (this.$data.$che) {
 							this.$data.$che.$che_all_invalid = bInvalid;
 						}
+						time('cheAll', 1);
 						return bInvalid
 					},
 					// Валидация контекста (проверка, есть ли у него не прошедшие валидацию поля)

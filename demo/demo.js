@@ -12,17 +12,16 @@ new Vue({
 		}
 	},
 	computed: {
-		data: function(){
+		data: function () {
 			return this.$data
 		}
+	},
+	methods: {
+		submitHandler: function () {
+			var invalid = this.cheAll();
+			if (invalid === false) {
+				alert('Form is valid and ready to submit')
+			}
+		}
 	}
-})
-/*var inp = document.querySelectorAll('.tt');
-for (var i = 0; i < inp.length; i++) {
-	addListenerMulti(inp[i], 'input change', function (evt) {
-		console.log(evt.type, evt.target.tagName, evt.target.type)
-	})
-}
-function addListenerMulti(el, s, fn) {
-	s.split(' ').forEach(e => el.addEventListener(e, fn, false));
-}*/
+});
