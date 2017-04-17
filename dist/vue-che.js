@@ -46,7 +46,7 @@
 	return new function() {
 		var serviceKeysToIgnore = ['Shift', 'Tab', 'Control', 'Command', 'Meta', 'ContextMenu'];
 		var invFieldPropName = '$err';
-		var errInpClass = 'che-err-inp';
+		var errInpClass;
 		var cheData = {
 			inputs: {
 				$all: []
@@ -97,6 +97,7 @@
 			if (!l10n[options.lang]) {
 				console.error('Vue-che error: language «' + options.lang + '» not found. Default is EN.');
 			}
+			errInpClass = options.errorClass || 'che-err-inp';
 			Vue.directive('che', {
 				bind: function(el, binding, vnode) {
 					var cheMethods = binding.modifiers;
