@@ -1,7 +1,7 @@
 {
 	"name": "vue-che",
-	"description": "Directive-based validation plugin",
-	"version": "0.1.0",
+	"description": "Directive-based Vue validation plugin",
+	"version": "0.2.0",
 	"author": "mankey",
 	"private": true,
 	"scripts": {},

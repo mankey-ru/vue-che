@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8" />
-	<title>Document</title>
-	<script src="./../src/vue-che.js"></script>
+	<title>Vue-che demo</title>
+	<script src="./../dist/vue-che.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.2.6/vue.js"></script>
 </head>
 <body>
@@ -14,16 +14,25 @@
 				<div>
 					Text input (required, email)
 				</div>
-				<input class="tt" v-model="mtext" v-che:mtext.reqd.f_email />
+				<input v-model="mtext" v-che:MTEXT.reqd.f_email />
 			</label>	
 			<span class="che-err-msg" v-html="cheErr('mtext')"></span>  
 
 			<hr />
+			<label>			
+				<div>
+					Text input (same as above - i.e. password repeat)
+				</div>
+				<input v-model="mtext_confirm" v-che:MTEXT_CONFIRM.sameas="{propname:'mtext'}" />
+			</label>	
+			<span class="che-err-msg" v-html="cheErr('mtext_confirm')"></span>  
+
+			<hr />
 			<label>
 				<div>Select</div> 
-				<select class="tt" v-model="mselect" v-che:mselect.reqd>
-					<option value="">NULLLL</option>
-					<option value="1" selected>aaa</option>
+				<select v-model="mselect" v-che:MSELECT.reqd>
+					<option value="">-- Not selected --</option>
+					<option value="1">aaa</option>
 					<option value="2">sss</option>
 					<option value="3">ddd</option>
 				</select>		
@@ -32,17 +41,17 @@
 
 			<hr />
 			<label>			
-				<div>Textarea</div> <textarea class="tt" v-model="mtextarea" v-che:mtextarea.reqd></textarea>
+				<div>Textarea</div> <textarea v-model="mtextarea" v-che:MTEXTAREA.reqd></textarea>
 			</label>
 			<span class="che-err-msg" v-html="cheErr('mtextarea')"></span>
 
 			<hr />	
 			<div>Radio</div>	
 			<label>			
-				<input type="radio" name="ra" class="tt" v-model="mradio" v-che:mradio.reqd value="1" /> 1
+				<input type="radio" v-model="mradio" v-che:MRADIO.reqd value="1" /> 1
 			</label>
 			<label>			
-				<input type="radio" name="ra" class="tt" v-model="mradio" v-che:mradio.reqd value="2" /> 2
+				<input type="radio" v-model="mradio" v-che:MRADIO.reqd value="2" /> 2
 			</label>
 			<span class="che-err-msg" v-html="cheErr('mradio')"></span>
 
@@ -50,10 +59,10 @@
 			<hr />
 			<div>Checkbox</div>
 			<label>
-				<input type="checkbox" name="ch" class="tt"  v-model="mchbox" v-che:mchbox.reqd value="1" /> 1
+				<input type="checkbox" v-model="mchbox" v-che:MCHBOX.reqd value="1" /> 1
 			</label>
 			<label>
-				<input type="checkbox" name="ch" class="tt"  v-model="mchbox" v-che:mchbox.reqd value="2" /> 2
+				<input type="checkbox" v-model="mchbox" v-che:MCHBOX.reqd value="2" /> 2
 			</label>
 			<span class="che-err-msg" v-html="cheErr('mchbox')"></span>
 

@@ -23,7 +23,7 @@
 	т.е. в тексте ошибки можно вывести стандартный текст, который возвращает метод валидации, а можно - кастомный (через v-if или v-show). Соответственно, если метод возвращает булево значение, текст можно использовать только кастомный
 */
 
-(function (root, factory) { // credits for wrapper: https://github.com/umdjs/umd
+(function(root, factory) { // credits for wrapper: https://github.com/umdjs/umd
 	var globalName = 'CHE'
 	if (typeof define === 'function' && define.amd) {
 		// AMD. Register as an anonymous module.
@@ -39,11 +39,11 @@
 		// Browser globals (root is window)
 		root[globalName] = factory();
 	}
-}(this, function () {
+}(this, function() {
 
 
 
-	return new function () {
+	return new function() {
 		var serviceKeysToIgnore = ['Shift', 'Tab', 'Control', 'Command', 'Meta', 'ContextMenu'];
 		var invFieldPropName = '$err';
 		var errInpClass = 'che-err-inp';
@@ -61,7 +61,7 @@
 			    * extras	- object:
 			    *	extras.param      ....TODO
 			*/
-			reqd: function (mval, context, extras) {
+			reqd: function(mval, context, extras) {
 				// можно передать отдельное условие, при котором поле будет считаться обязательным
 				// v-che:PLGENDER.reqd="{$context: tr, condition: tr._xtra_gender_required}"
 				// соответственно если передать тупо контекст
@@ -70,28 +70,35 @@
 				var hasExtraCondition = extras.param && typeof extras.param.condition !== 'undefined';
 				var extraCondition = hasExtraCondition ? extras.param.condition : true;
 				var mvalFalsey = !mval || !mval.length; // made for empty arrays (multiple checkboxes)
-				return mvalFalsey && extraCondition ? 'Field is required' : '';
+				return mvalFalsey && extraCondition ? MSG.reqd : false;
 			},
-			f_date: function (mval) {
-				return !mval || /^\d{2}\.\d{2}\.\d{4}$/.test(mval) ? '' : 'Формат даты - дд.мм.гггг';
+			f_date_ru: function(mval) {
+				return !mval || /^\d{2}\.\d{2}\.\d{4}$/.test(mval) ? false : MSG.f_date_ru;
 			},
-			f_email: function (mval) {
+			f_email: function(mval) {
 				// RFC 2822 Section 3.4.1 is too much, so this simple regex is enough I guess
-				return !mval || /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mval) ? '' : 'Incorrect format';
+				return !mval || /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mval) ? false : MSG.f_email;
+			},
+			// Basic setup: <input v-model="mtext_confirm" v-che:MTEXT_CONFIRM.sameas="{propname:'mtext'}" />
+			sameas: function(mval, context, extras) {
+				return mval === context[extras.param.propname] ? false : MSG.sameas;
 			}
 		}
-		this._methods = cheMethodsLib;
-		this._data = cheData;
 
+		var MSG;
 		var customEventsLib = {};
 
-		this.install = function (Vue, options) {
+		this.install = function(Vue, options) {
+			MSG = l10n[options.lang] || 'en';
+			if (!l10n[options.lang]) {
+				console.error('Vue-che error: language «' + options.lang + '» not found. Default is EN.');
+			}
 			Vue.directive('che', {
-				bind: function (el, binding, vnode) {
+				bind: function(el, binding, vnode) {
 					var cheMethods = binding.modifiers;
 					var fieldName = binding.arg.toUpperCase(); // привожу к апперкейзу чтобы не было ошибок именами пропертей с разным регистром. Дело в том что хтмл-атрибуты всегда lowercase, поэтому модификатор директивы v-che.myMod в коде будет mymod, а я делаю их апперкейзом для очевидности, что они отличаются (проглядеть кемелкейз легко)
 					var $inp = el;
-					var contextIsGlobal = !binding.value;
+					var contextIsGlobal = typeof binding.value === 'undefined' || typeof binding.value.$context === 'undefined';
 					var context; // куда класть объект состояния валидации ($che).
 					if (contextIsGlobal) {
 						context = vnode.context.$data; // Если в значение атрибута директивы пусто (che:xx.yy=""), берётся глобальная data
@@ -129,14 +136,13 @@
 					for (var cheMethodName in cheMethods) {
 						specificEvents += ' cheSpecific.' + cheMethodName;
 					}
-
+					var basicEvent = $inp.tagName === 'SELECT' ? 'change' : 'input';
 					var customEventsStr = ' cheAll' + specificEvents; // TODO DO IT ONCE!!
 					_createEventMulti(customEventsStr)
-					_addListenerMulti($inp, 'input change' + customEventsStr, function (evt) {
+					_addListenerMulti($inp, basicEvent + customEventsStr, function(evt) { // 'change' needed?
 						if (serviceKeysToIgnore.indexOf(evt.key) !== -1) {
 							return
 						}
-
 						var modelValue;
 						// значение беру из модели, а не из DOM value. Исхожу из предположения, что дешевле пройтись по свойствам targetObj в апперкейзе и найти нужное
 						for (var propName in context) {
@@ -179,7 +185,7 @@
 
 							}
 							else {
-								var availableMeth = Object.keys(cheMethodsLib).filter(function (k) {
+								var availableMeth = Object.keys(cheMethodsLib).filter(function(k) {
 									return typeof cheMethodsLib[k] === 'function'
 								}).join(', ');
 								console.error('vue-che: Not found validation method with name «' + cheMethodName + '».\nAvailable methods: ' + availableMeth)
@@ -221,7 +227,7 @@
 						* <span v-html="cheErr('LASTNAME')" />
 
 					*/
-					cheErr: function (fieldName, context) { // проверка, валидно ли поле
+					cheErr: function(fieldName, context) { // проверка, валидно ли поле
 						fieldName = fieldName.toUpperCase(); // string expected
 						context = context || this.$data;
 						time('cheErr')
@@ -243,7 +249,7 @@
 						}
 					},
 					// Проверка тупо всех инпутов. TODO подумать, как сделать оптимальнее.
-					cheAll: function () {
+					cheAll: function() {
 						time('cheAll');
 						for (var i = 0; i < cheData.inputs.$all.length; i++) {
 							cheData.inputs.$all[i].dispatchEvent(customEventsLib.cheAll)
@@ -263,7 +269,7 @@
 					// пример использования:
 					// <span class="cheContex" v-html="cheMeth(pass)">
 					// У этого пассажира не проходит валидацию какое-то поле (данная ошибка выводится при наличии)</span>
-					cheContext: function (context) { // проверка, валиден ли контекст целиком
+					cheContext: function(context) { // проверка, валиден ли контекст целиком
 						time('cheContext');
 						var bInvalid = false;
 						for (var fieldName in context.$che) {
@@ -283,7 +289,7 @@
 					// Отличие от cheTrigger в том что данный метод не дёргает саму валидацию, а лишь получает ранее вычисленный результат
 					// пример использования:
 					// <span class="che-err" v-html="cheMeth('LASTNAME','reqd', pass)">У этого пассажира не проходит валидацию методом reqd поле с названием lastname (данная ошибка выводится при наличии)</span>
-					cheMeth: function (fieldName, validationMethod, context) {
+					cheMeth: function(fieldName, validationMethod, context) {
 						context = context || this; // если передан вложенный объект, признаки валидации будут устанавливаться ему. Если нет - используется глобальная data
 						var fieldValidationProps = context.$che ? context.$che[fieldName] : false;
 						if (!!fieldValidationProps && !!fieldValidationProps[validationMethod]) {
@@ -303,7 +309,7 @@
 					    context             Vue object. Optional. Контекст может быть передан, если нет то                      берётся глобальная $data.
 
 					*/
-					cheTrigger: function (fieldNames, validationMethod, context) {
+					cheTrigger: function(fieldNames, validationMethod, context) {
 						var context = context || this;
 						var fieldsArray = fieldNames.split(' ');
 						for (var i = 0; i < fieldsArray.length; i++) {
@@ -323,7 +329,7 @@
 					    У этого инпута будет присвоен класс только если для этого поля есть ошибка
 					    Нужен для случаев типа PIRS-13861
 					*/
-					cheField: function (fieldNames, context) {
+					cheField: function(fieldNames, context) {
 						var context = context || this;
 						var fieldsArray = fieldNames.split(' ');
 						for (var i = 0; i < fieldsArray.length; i++) {
@@ -351,7 +357,7 @@
 		}
 
 		function _createEventMulti(evtNames) {
-			evtNames.split(' ').forEach(function (evtName) {
+			evtNames.split(' ').forEach(function(evtName) {
 				customEventsLib[evtName] = new CustomEvent(evtName)
 			});
 		}
@@ -370,7 +376,25 @@
 			else if (conditionToAdd) {
 				el.className += ' ' + theClass;
 			}
+		};
+		var l10n = {
+			en: {
+				reqd: 'Field is required',
+				f_date_ru: 'Формат даты - дд.мм.гггг',
+				f_email: 'Incorrect email format',
+				sameas: 'Values do not match'
+			},
+			ru: {
+				reqd: 'Поле обязательное',
+				f_date_ru: 'Формат даты - дд.мм.гггг',
+				f_email: 'Формат адреса e-mail некорректный',
+				sameas: 'Значения не совпадают'
+			}
 		}
+
+		this.methods = cheMethodsLib;
+		this.data = cheData;
+		this.l10n = l10n;
 	};
 
 

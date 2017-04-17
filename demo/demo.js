@@ -1,23 +1,22 @@
-Vue.use(CHE)
+Vue.use(CHE, {lang: 'en'});
 new Vue({
 	el: '#vue-app',
 	data: {
 		mtext: '',
-		mselect: null,
+		mtext_confirm: '',
+		mselect: '',
 		mtextarea: '',
 		mradio: null,
 		mchbox: [],
-		$che: {
-
-		}
+		$che: {}
 	},
 	computed: {
-		data: function () {
+		data: function() {
 			return this.$data
 		}
 	},
 	methods: {
-		submitHandler: function () {
+		submitHandler: function() {
 			var invalid = this.cheAll();
 			if (invalid === false) {
 				alert('Form is valid and ready to submit')
