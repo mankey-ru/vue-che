@@ -55,31 +55,35 @@
 		var _this = this;
 		var cheMethodsLib = {
 			/**
-			    Each validation method has following arguments:
+			    Each validation method receives following arguments:
 			    * mval		- current model value
 			    * context	- could be either global $data or its subproperty (i.e. array element)
 			    * extras	- object:
 			    *	extras.param      ....TODO
 			*/
+			// * Basic setup: 
+			// <input v-model="mtext" v-che:MTEXT.reqd />
+			// * Advanced (conditional) usage:
+			// <input v-model="gender" v-che:GENDER.reqd="{condition: train.gender_required}" />
+			// * the same with custom (not global) context:
+			// <input v-model="passenger.gender" v-che:GENDER.reqd="{$context: passenger, condition: train.gender_required}" />
 			reqd: function(mval, context, extras) {
-				// можно передать отдельное условие, при котором поле будет считаться обязательным
-				// v-che:PLGENDER.reqd="{$context: tr, condition: tr._xtra_gender_required}"
-				// соответственно если передать тупо контекст
-				// v-che:PLGENDER.reqd="tr" 
-				// то поле будет обязательным всегда
 				var hasExtraCondition = extras.param && typeof extras.param.condition !== 'undefined';
 				var extraCondition = hasExtraCondition ? extras.param.condition : true;
 				var mvalFalsey = !mval || !mval.length; // made for empty arrays (multiple checkboxes)
 				return mvalFalsey && extraCondition ? MSG.reqd : false;
 			},
+			// * Basic setup: 
+			// <input v-model="mydate" v-che:MYDATE.f_date_ru />
 			f_date_ru: function(mval) {
 				return !mval || /^\d{2}\.\d{2}\.\d{4}$/.test(mval) ? false : MSG.f_date_ru;
 			},
 			f_email: function(mval) {
-				// RFC 2822 Section 3.4.1 is too much, so this simple regex is enough I guess
+				// RFC 2822 Section 3.4.1 is monstrous, so this simple regex is enough I guess
 				return !mval || /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mval) ? false : MSG.f_email;
 			},
-			// Basic setup: <input v-model="mtext_confirm" v-che:MTEXT_CONFIRM.sameas="{propname:'mtext'}" />
+			// Basic setup: 
+			// <input v-model="mtext_confirm" v-che:MTEXT_CONFIRM.sameas="{propname:'mtext'}" />
 			sameas: function(mval, context, extras) {
 				return mval === context[extras.param.propname] ? false : MSG.sameas;
 			}
