@@ -368,7 +368,9 @@
 		}
 
 		function _addListenerMulti(el, s, fn) {
-			s.split(' ').forEach(e => el.addEventListener(e, fn, false));
+			s.split(' ').forEach(function(evtName) {
+				el.addEventListener(evtName, fn, false);
+			});
 		}
 		// TODO перенести в либу (убрать из vue-router)
 		function _toggleClass(el, theClass, boo) { // classList.toggle second argument support isnt good so...
